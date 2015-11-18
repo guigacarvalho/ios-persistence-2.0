@@ -11,7 +11,7 @@ import AVFoundation
 
 class PlaySoundsViewController: UIViewController {
     
-    let SliderValueKey = "Slider Value Key"
+    let SliderValueKey = "pitchValue"
     
     var audioPlayer:AVAudioPlayer!
     var receivedAudio:RecordedAudio!
@@ -25,6 +25,9 @@ class PlaySoundsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Getting persisted slider position
+        sliderView.value = NSUserDefaults.standardUserDefaults().floatForKey(SliderValueKey)
         
         do {
             audioPlayer = try AVAudioPlayer(contentsOfURL: receivedAudio.filePathUrl)
@@ -53,6 +56,9 @@ class PlaySoundsViewController: UIViewController {
         
         // Get the pitch from the slider
         let pitch = sliderView.value
+        
+        // Persisting the slider position
+        NSUserDefaults.standardUserDefaults().setFloat(pitch, forKey: SliderValueKey)
         
         // Play the sound
         playAudioWithVariablePitch(pitch)
