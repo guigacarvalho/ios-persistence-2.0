@@ -21,12 +21,20 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if NSFileManager.defaultManager().fileExistsAtPath(audioFileURL().path!) {
+            print("The file already exists!")
+            shouldSegueToSoundPlayer = true
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
         //Hide the stop button
         stopButton.hidden = true
         recordButton.enabled = true
+        if (shouldSegueToSoundPlayer) {
+            recordedAudio = RecordedAudio(filePathUrl: audioFileURL(), title: audioFileURL().pathExtension)
+            self.performSegueWithIdentifier("stopRecording", sender: self)
+        }
     }
 
     @IBAction func recordAudio(sender: UIButton) {
@@ -43,10 +51,7 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
         }
         
         // Create the path to the file.
-        let filename = "usersVoice.wav"
-        let dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String
-        let pathArray = [dirPath, filename]
-        let fileURL =  NSURL.fileURLWithPathComponents(pathArray)!
+        let fileURL =  audioFileURL()
 
         // Initialize and prepare the recorder
         do {
@@ -92,6 +97,15 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
         
         // This function stops the audio. We will then wait to hear back from the recorder, 
         // through the audioRecorderDidFinishRecording method
+    }
+    
+    func audioFileURL() ->  NSURL {
+        let filename = "usersVoice.wav"
+        let dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] 
+        let pathArray = [dirPath, filename]
+        let fileURL =  NSURL.fileURLWithPathComponents(pathArray)!
+        
+        return fileURL
     }
 }
 
